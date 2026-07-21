@@ -20,9 +20,9 @@ Declare Function NnRecv(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, B
 ' <summary>
 ' NnSocket
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="domain"></param>
-' <param name="protocol"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="domain">Long</param>
+' <param name="protocol">Long</param>
 ' <returns>Returns any ptr.</returns>
 Function NnSocket(Byval dllInstance As Any Ptr, Byval domain As Long, Byval protocol As Long) As Any Ptr
     Dim lResult As Any Ptr
@@ -42,8 +42,8 @@ End Function
 ' <summary>
 ' NnClose
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
 ' <returns>Returns long.</returns>
 Function NnClose(Byval dllInstance As Any Ptr, Byval socket As Any Ptr) As Long
     Dim lResult As Long
@@ -63,12 +63,12 @@ End Function
 ' <summary>
 ' NnSetsockopt
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="level"></param>
-' <param name="options"></param>
-' <param name="optval"></param>
-' <param name="optvallen"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="level">Long</param>
+' <param name="options">Long</param>
+' <param name="optval">Ptr</param>
+' <param name="optvallen">Uinteger</param>
 ' <returns>Returns long.</returns>
 Function NnSetsockopt(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As Uinteger) As Long
     Dim lResult As Long
@@ -88,12 +88,12 @@ End Function
 ' <summary>
 ' NnGetsockopt
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="level"></param>
-' <param name="options"></param>
-' <param name="optval"></param>
-' <param name="optvallen"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="level">Long</param>
+' <param name="options">Long</param>
+' <param name="optval">String</param>
+' <param name="optvallen">Uinteger</param>
 ' <returns>Returns long.</returns>
 Function NnGetsockopt(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval level As Long, Byval options As Long, Byref optval As String, Byval optvallen As Uinteger) As Long
     Dim lResult As Long
@@ -113,9 +113,9 @@ End Function
 ' <summary>
 ' NnBind
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="addr"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="addr">ZString Ptr</param>
 ' <returns>Returns long.</returns>
 Function NnBind(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval addr As Const ZString Ptr) As Long
     Dim lResult As Long
@@ -135,9 +135,9 @@ End Function
 ' <summary>
 ' NnConnect
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="addr"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="addr">Const ZString Ptr</param>
 ' <returns>Returns long.</returns>
 Function NnConnect(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval addr As Const ZString Ptr) As Long
     Dim lResult As Long
@@ -157,9 +157,9 @@ End Function
 ' <summary>
 ' NnShutdown
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="how"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="how">Long</param>
 ' <returns>Returns long.</returns>
 Function NnShutdown(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval how As Long) As Long
     Dim lResult As Long
@@ -179,11 +179,11 @@ End Function
 ' <summary>
 ' NnSend
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="buf"></param>
-' <param name="buflen"></param>
-' <param name="flags"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="buf">Ptr</param>
+' <param name="buflen">Uinteger</param>
+' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
 Function NnSend(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long
     Dim lResult As Long
@@ -203,11 +203,11 @@ End Function
 ' <summary>
 ' NnRecv
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="socket"></param>
-' <param name="buf"></param>
-' <param name="buflen"></param>
-' <param name="flags"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Ptr</param>
+' <param name="buf">Ptr</param>
+' <param name="buflen">Uinteger</param>
+' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
 Function NnRecv(Byval dllInstance As Any Ptr, Byval socket As Any Ptr, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long
     Dim lResult As Long

@@ -15,7 +15,7 @@ Declare Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, 
 ' <summary>
 ' NnErrno
 ' </summary>
-' <param name="dllInstance"></param>
+' <param name="dllInstance">Ptr</param>
 ' <returns>Returns integer.</returns>
 Function NnErrno(Byval dllInstance As Any Ptr) As Long
     Dim lResult As Long
@@ -35,8 +35,8 @@ End Function
 ' <summary>
 ' NnStrerror
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="errnum"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="errnum">Integer</param>
 ' <returns>Returns zstring ptr.</returns>
 Function NnStrerror(Byval dllInstance As Any Ptr, Byval errnum As Integer) As Const ZString Ptr
     Dim lResult As Const ZString Ptr
@@ -56,9 +56,9 @@ End Function
 ' <summary>
 ' NnSymbol
 ' </summary>
-' <param name="dllInstance"></param>
-' <param name="index"></param>
-' <param name="value"></param>
+' <param name="dllInstance">Ptr</param>
+' <param name="index">Integer</param>
+' <param name="value">Long</param>
 ' <returns>Returns zstring ptr.</returns>
 Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, Byref value As Long) As Const ZString Ptr
     Dim lResult As Const ZString Ptr
