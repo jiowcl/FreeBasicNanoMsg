@@ -10,12 +10,9 @@ Const NN_VERSION_CURRENT  As Long = 6
 Const NN_VERSION_REVISION As Long = 0
 Const NN_VERSION_AGE      As Long = 1
 
-' Socket Types
-Const NN_PROTO_REQREP     As Long = 3
-Const NN_REQ              As Long = NN_PROTO_REQREP * 16 + 0
-Const NN_REP              As Long = NN_PROTO_REQREP * 16 + 1
-
-Const NN_REQ_RESEND_IVL   As Long = 1
+' Socket Types / Protocols
+Const NN_PROTO_PAIR       As Long = 1
+Const NN_PAIR             As Long = NN_PROTO_PAIR * 16 + 0
 
 Const NN_PROTO_PUBSUB     As Long = 2
 Const NN_PUB              As Long = NN_PROTO_PUBSUB * 16 + 0
@@ -23,13 +20,42 @@ Const NN_SUB              As Long = NN_PROTO_PUBSUB * 16 + 1
 Const NN_SUB_SUBSCRIBE    As Long = 1
 Const NN_SUB_UNSUBSCRIBE  As Long = 2
 
+Const NN_PROTO_REQREP     As Long = 3
+Const NN_REQ              As Long = NN_PROTO_REQREP * 16 + 0
+Const NN_REP              As Long = NN_PROTO_REQREP * 16 + 1
+Const NN_REQ_RESEND_IVL   As Long = 1
+
+Const NN_PROTO_PIPELINE   As Long = 5
+Const NN_PUSH             As Long = NN_PROTO_PIPELINE * 16 + 0
+Const NN_PULL             As Long = NN_PROTO_PIPELINE * 16 + 1
+
+Const NN_PROTO_SURVEY     As Long = 6
+Const NN_SURVEYOR         As Long = NN_PROTO_SURVEY * 16 + 2
+Const NN_RESPONDENT       As Long = NN_PROTO_SURVEY * 16 + 3
+Const NN_SURVEYOR_DEADLINE As Long = 1
+
+Const NN_PROTO_BUS        As Long = 7
+Const NN_BUS              As Long = NN_PROTO_BUS * 16 + 0
+
 ' SP Address Families
 Const AF_SP                As Long = 1
 Const AF_SP_RAW            As Long = 2
 
-' 
+' Transports
+Const NN_INPROC            As Long = -1
+Const NN_IPC               As Long = -2
 Const NN_TCP               As Long = -3
+Const NN_WS                As Long = -4
+
 Const NN_TCP_NODELAY       As Long = 1
+
+Const NN_IPC_SEC_ATTR      As Long = 1
+Const NN_IPC_OUTBUFSZ      As Long = 2
+Const NN_IPC_INBUFSZ       As Long = 3
+
+Const NN_WS_MSG_TYPE       As Long = 1
+Const NN_WS_MSG_TYPE_TEXT  As Long = &h01
+Const NN_WS_MSG_TYPE_BINARY As Long = &h02
 
 ' Max Size of an SP Address
 Const NN_SOCKADDR_MAX      As Long = 128
@@ -56,16 +82,17 @@ Const NN_SOCKET_NAME       As Long = 15
 Const NN_RCVMAXSIZE        As Long = 16
 Const NN_MAXTTL            As Long = 17
 
-' Message Options
-
 ' Send/Recv Options
 Const NN_DONTWAIT          As Long = 1
+
+' Zero-copy Message Size Sentinel (size_t)-1
+Const NN_MSG               As Long = -1
 
 ' Ancillary Data
 Const PROTO_SP             As Long = 1
 Const SP_HDR               As Long = 1
 
-' Socket Mutliplexing Support
+' Socket Multiplexing Support
 Const NN_POLLIN            As Long = 1
 Const NN_POLLOUT           As Long = 2
 
@@ -126,7 +153,9 @@ Const ESOCKTNOSUPPORT As Long = NN_HAUSNUMERO + 28
 Const ETERM          As Long = NN_HAUSNUMERO + 53
 Const EFSM           As Long = NN_HAUSNUMERO + 54
 
-' Type
-Type NnMsgT
-    __(0 To 63) As UByte
+' Matches struct nn_pollfd
+Type NnPollFd
+    fd      As Long
+    events  As Short
+    revents As Short
 End Type

@@ -18,11 +18,14 @@ Building requires FreeBasic Compiler and test under Windows 10.
 ## API Notes
 
 - Socket handles are `Long` (matching C `int`), not pointers.
+- Protocols: `NN_PAIR`, `NN_PUB`/`NN_SUB`, `NN_REQ`/`NN_REP`, `NN_PUSH`/`NN_PULL`, `NN_SURVEYOR`/`NN_RESPONDENT`, `NN_BUS`.
+- Transports: `NN_INPROC`, `NN_IPC`, `NN_TCP`, `NN_WS` (plus `NN_TCP_NODELAY`, `NN_IPC_*`, `NN_WS_MSG_TYPE*`).
 - `NnSetsockopt` / `LibNanomsgSocket.Setsockopt` take a pointer (`Any Ptr`) and length.
 - Use `NnSetsockoptString` / `SetsockoptString` for topic strings (`NN_SUB_SUBSCRIBE`).
-- Use `NnSetsockoptInt` / `SetsockoptInt` for integer options (`NN_RCVTIMEO`, …).
+- Use `NnSetsockoptInt` / `SetsockoptInt` for integer options (`NN_RCVTIMEO`, `NN_SURVEYOR_DEADLINE`, …).
 - `NnGetsockopt` requires `optval As Any Ptr` and `optvallen As UInteger Ptr` (in/out length), matching the C API.
 - Use `NnGetsockoptInt` / `GetsockoptInt` for integer options.
+- Zero-copy size sentinel: `NN_MSG`. Poll struct: `NnPollFd` (`NN_POLLIN` / `NN_POLLOUT`).
 
 ## Example
 
