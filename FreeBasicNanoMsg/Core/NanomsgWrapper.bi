@@ -42,15 +42,18 @@ End Type
 ' Declare Type LibNanomsgSocket
 Type LibNanomsgSocket Extends LibNanomsgWrapper
 public:
-    Declare Function Socket(Byval domain As Long, Byval protocol As Long) As Any Ptr
-    Declare Function Close(Byval socket_ As Any Ptr) As Long
-    Declare Function Setsockopt(Byval socket_ As Any Ptr, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As UInteger) As Long
-    Declare Function Getsockopt(Byval socket_ As Any Ptr, Byval level As Long, Byval options As Long, Byref optval As String, Byval optvallen As UInteger) As Long
-    Declare Function Bind(Byval socket_ As Any Ptr, Byval addr As Const ZString Ptr) As Long
-    Declare Function Connect(Byval socket_ As Any Ptr, Byval addr As Const ZString Ptr) As Long
-    Declare Function Shutdown(Byval socket_ As Any Ptr, Byval how As Long) As Long
-    Declare Function Send(Byval socket_ As Any Ptr, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
-    Declare Function Recv(Byval socket_ As Any Ptr, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
+    Declare Function Socket(Byval domain As Long, Byval protocol As Long) As Long
+    Declare Function Close(Byval socket_ As Long) As Long
+    Declare Function Setsockopt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As UInteger) As Long
+    Declare Function SetsockoptString(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Const ZString Ptr) As Long
+    Declare Function SetsockoptInt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Long) As Long
+    Declare Function Getsockopt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As UInteger Ptr) As Long
+    Declare Function GetsockoptInt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byref optval As Long) As Long
+    Declare Function Bind(Byval socket_ As Long, Byval addr As Const ZString Ptr) As Long
+    Declare Function Connect(Byval socket_ As Long, Byval addr As Const ZString Ptr) As Long
+    Declare Function Shutdown(Byval socket_ As Long, Byval how As Long) As Long
+    Declare Function Send(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
+    Declare Function Recv(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
 End Type
 
 ' Type LibNanomsgWrapper
@@ -157,96 +160,132 @@ End Function
 ' </summary>
 ' <param name="domain">Long</param>
 ' <param name="protocol">Long</param>
-' <returns>Returns any ptr.</returns>
-Function LibNanomsgSocket.Socket(Byval domain As Long, Byval protocol As Long) As Any Ptr
+' <returns>Returns socket handle (Long), or -1 on error.</returns>
+Function LibNanomsgSocket.Socket(Byval domain As Long, Byval protocol As Long) As Long
     Function = NnSocket(LibNanomsgWrapper.DllInstance(), domain, protocol)
 End Function
   
 ' <summary>
 ' Close
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Close(Byval socket_ As Any Ptr) As Long   
+Function LibNanomsgSocket.Close(Byval socket_ As Long) As Long   
     Function = NnClose(LibNanomsgWrapper.DllInstance(), socket_)
 End Function
 
 ' <summary>
 ' Setsockopt
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="level">Long</param>
 ' <param name="options">Long</param>
 ' <param name="optval">Ptr</param>
 ' <param name="optvallen">Uinteger</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Setsockopt(Byval socket_ As Any Ptr, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As Uinteger) As Long   
+Function LibNanomsgSocket.Setsockopt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As Uinteger) As Long   
     Function = NnSetsockopt(LibNanomsgWrapper.DllInstance(), socket_, level, options, optval, optvallen)
+End Function
+
+' <summary>
+' SetsockoptString
+' </summary>
+' <param name="socket_">Long</param>
+' <param name="level">Long</param>
+' <param name="options">Long</param>
+' <param name="optval">Const ZString Ptr</param>
+' <returns>Returns long.</returns>
+Function LibNanomsgSocket.SetsockoptString(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Const ZString Ptr) As Long
+    Function = NnSetsockoptString(LibNanomsgWrapper.DllInstance(), socket_, level, options, optval)
+End Function
+
+' <summary>
+' SetsockoptInt
+' </summary>
+' <param name="socket_">Long</param>
+' <param name="level">Long</param>
+' <param name="options">Long</param>
+' <param name="optval">Long</param>
+' <returns>Returns long.</returns>
+Function LibNanomsgSocket.SetsockoptInt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Long) As Long
+    Function = NnSetsockoptInt(LibNanomsgWrapper.DllInstance(), socket_, level, options, optval)
 End Function
 
 ' <summary>
 ' Getsockopt
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="level">Long</param>
 ' <param name="options">Long</param>
-' <param name="optval">String</param>
-' <param name="optvallen">Uinteger</param>
+' <param name="optval">Ptr</param>
+' <param name="optvallen">UInteger Ptr</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Getsockopt(Byval socket_ As Any Ptr, Byval level As Long, Byval options As Long, Byref optval As String, Byval optvallen As Uinteger) As Long   
+Function LibNanomsgSocket.Getsockopt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byval optval As Any Ptr, Byval optvallen As UInteger Ptr) As Long   
     Function = NnGetsockopt(LibNanomsgWrapper.DllInstance(), socket_, level, options, optval, optvallen)
+End Function
+
+' <summary>
+' GetsockoptInt
+' </summary>
+' <param name="socket_">Long</param>
+' <param name="level">Long</param>
+' <param name="options">Long</param>
+' <param name="optval">Long (byref)</param>
+' <returns>Returns long.</returns>
+Function LibNanomsgSocket.GetsockoptInt(Byval socket_ As Long, Byval level As Long, Byval options As Long, Byref optval As Long) As Long
+    Function = NnGetsockoptInt(LibNanomsgWrapper.DllInstance(), socket_, level, options, optval)
 End Function
 
 ' <summary>
 ' Bind
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="addr">Const ZString Ptr</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Bind(Byval socket_ As Any Ptr, Byval addr As Const ZString Ptr) As Long   
+Function LibNanomsgSocket.Bind(Byval socket_ As Long, Byval addr As Const ZString Ptr) As Long   
     Function = NnBind(LibNanomsgWrapper.DllInstance(), socket_, addr)
 End Function
 
 ' <summary>
 ' Connect
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="addr">Const ZString Ptr</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Connect(Byval socket_ As Any Ptr, Byval addr As Const ZString Ptr) As Long   
+Function LibNanomsgSocket.Connect(Byval socket_ As Long, Byval addr As Const ZString Ptr) As Long   
     Function = NnConnect(LibNanomsgWrapper.DllInstance(), socket_, addr)
 End Function
 
 ' <summary>
 ' Shutdown
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="how">Long</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Shutdown(Byval socket_ As Any Ptr, Byval how As Long) As Long   
+Function LibNanomsgSocket.Shutdown(Byval socket_ As Long, Byval how As Long) As Long   
     Function = NnShutdown(LibNanomsgWrapper.DllInstance(), socket_, how)
 End Function
 
 ' <summary>
 ' Send
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="buf">Ptr</param>
 ' <param name="buflen">Uinteger</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Send(Byval socket_ As Any Ptr, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long    
+Function LibNanomsgSocket.Send(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long    
     Function = NnSend(LibNanomsgWrapper.DllInstance(), socket_, buf, buflen, flags)
 End Function
 
 ' <summary>
 ' Recv
 ' </summary>
-' <param name="socket_">Ptr</param>
+' <param name="socket_">Long</param>
 ' <param name="buf">Ptr</param>
 ' <param name="buflen">Uinteger</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
-Function LibNanomsgSocket.Recv(Byval socket_ As Any Ptr, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long   
+Function LibNanomsgSocket.Recv(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long   
     Function = NnRecv(LibNanomsgWrapper.DllInstance(), socket_, buf, buflen, flags)
 End Function

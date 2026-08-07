@@ -19,7 +19,7 @@ Const lpszServerAddr As String = "tcp://*:1700"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_REP)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_REP)
     Dim Rc As Long = NnSocketRec.Bind(Socket, lpszServerAddr)
     
     Print("Bind an IP address: " & lpszServerAddr)

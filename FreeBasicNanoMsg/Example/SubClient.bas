@@ -16,16 +16,12 @@ Const lpszServerAddr As String = "tcp://localhost:1700"
 Dim hLibrary As Any Ptr = NnDllOpen(lpszLibNnDll)
 
 If hLibrary > 0 Then
-    Dim Socket As Any Ptr = NnSocket(hLibrary, AF_SP, NN_SUB)
+    Dim Socket As Long = NnSocket(hLibrary, AF_SP, NN_SUB)
     Dim Rc As Long = NnConnect(hLibrary, Socket, lpszServerAddr)
     
-    Dim lpszSubscribePtr As ZString Ptr
     Dim lpszSubscribe As String = "quotes"
 
-    lpszSubscribePtr = CAllocate(Len(lpszSubscribe), SizeOfDefZStringPtr(lpszSubscribePtr))
-    *lpszSubscribePtr = lpszSubscribe
-
-    NnSetsockopt(hLibrary, Socket, NN_SUB, NN_SUB_SUBSCRIBE, lpszSubscribePtr, Len(lpszSubscribe))
+    NnSetsockoptString(hLibrary, Socket, NN_SUB, NN_SUB_SUBSCRIBE, StrPtr(lpszSubscribe))
     
     While 1
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(64)
@@ -43,10 +39,6 @@ If hLibrary > 0 Then
         
         Sleep(2)
     Wend
-
-    Deallocate(lpszSubscribePtr)
-
-    lpszSubscribePtr = 0
     
     NnClose(hLibrary, Socket)
        

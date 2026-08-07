@@ -19,7 +19,7 @@ Declare Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, 
 ' <returns>Returns integer.</returns>
 Function NnErrno(Byval dllInstance As Any Ptr) As Long
     Dim lResult As Long
-    Dim pFuncCall As Function() As Long
+    Dim pFuncCall As Function Cdecl() As Long
   
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nn_errno")
@@ -40,7 +40,7 @@ End Function
 ' <returns>Returns zstring ptr.</returns>
 Function NnStrerror(Byval dllInstance As Any Ptr, Byval errnum As Integer) As Const ZString Ptr
     Dim lResult As Const ZString Ptr
-    Dim pFuncCall As Function(Byval errnum As Integer) As ZString Ptr
+    Dim pFuncCall As Function Cdecl(Byval errnum As Integer) As ZString Ptr
   
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nn_strerror")
@@ -62,13 +62,13 @@ End Function
 ' <returns>Returns zstring ptr.</returns>
 Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, Byref value As Long) As Const ZString Ptr
     Dim lResult As Const ZString Ptr
-    Dim pFuncCall As Function(Byval index As Integer, Byref value As Long) As ZString Ptr
+    Dim pFuncCall As Function Cdecl(Byval index As Integer, Byval value As Long Ptr) As ZString Ptr
   
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nn_symbol")
 
         If (pFuncCall > 0) Then
-            lResult = pFuncCall(index, value)
+            lResult = pFuncCall(index, @value)
         End If
     End If
   

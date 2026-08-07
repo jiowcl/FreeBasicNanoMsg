@@ -19,7 +19,7 @@ Const lpszServerAddr As String = "tcp://localhost:1700"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_REQ)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_REQ)
     Dim Rc As Long = NnSocketRec.Connect(Socket, lpszServerAddr)
     
     Print("Connect to Server: " & lpszServerAddr)

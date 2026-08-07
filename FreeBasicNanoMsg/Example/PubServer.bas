@@ -22,7 +22,7 @@ Const lpszServerAddr As String = "tcp://*:1700"
 Dim hLibrary As Any Ptr = NnDllOpen(lpszLibNnDll)
 
 If hLibrary > 0 Then
-    Dim Socket As Any Ptr = NnSocket(hLibrary, AF_SP, NN_PUB)
+    Dim Socket As Long = NnSocket(hLibrary, AF_SP, NN_PUB)
     Dim Rc As Long = NnBind(hLibrary, Socket, lpszServerAddr)
     
     Print("Bind an IP address: " & lpszServerAddr)
@@ -30,32 +30,20 @@ If hLibrary > 0 Then
     Randomize
     
     While 1
-        Dim lpszRecvBufferPtr As Any Ptr = CAllocate(32)
         Dim lpszSendBufferPtr As ZString Ptr
         Dim lpszTopic As String = "quotes"
         Dim lpszSendMessage As String = lpszTopic & "#Bid: " & Str(RndRange(9000, 1000)) & ",Ask:" + Str(RndRange(9000, 1000))
-
-        NnRecv(hLibrary, Socket, lpszRecvBufferPtr, 32, 0)
-        
-        Sleep(2)
-        
-        Dim lpszReturnMessage As String = *CPtr(ZString Ptr, lpszRecvBufferPtr)
-        
-        If lpszReturnMessage <> "" Then
-            Print("Received: ")
-            Print(lpszReturnMessage)
-        End If
 
         lpszSendBufferPtr = CAllocate(Len(lpszSendMessage), SizeOfDefZStringPtr(lpszSendBufferPtr))
         *lpszSendBufferPtr = lpszSendMessage
 
         NnSend(hLibrary, Socket, lpszSendBufferPtr, Len(lpszSendMessage), 0)
+        Print("Published: " & lpszSendMessage)
 
-        Deallocate(lpszRecvBufferPtr) 
-        Deallocate(lpszSendBufferPtr) 
-
-        lpszRecvBufferPtr = 0
+        Deallocate(lpszSendBufferPtr)
         lpszSendBufferPtr = 0
+
+        Sleep(500)
     Wend
     
     NnClose(hLibrary, Socket)

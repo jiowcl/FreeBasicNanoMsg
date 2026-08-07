@@ -25,7 +25,7 @@ Const lpszServerAddr As String = "tcp://*:1689"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_PUB)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_PUB)
     Dim Rc As Long = NnSocketRec.Bind(Socket, lpszServerAddr)
 
     Print("Bind an IP address: " & lpszServerAddr)
@@ -33,32 +33,20 @@ If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
     Randomize
     
     While 1
-        Dim lpszRecvBufferPtr As Any Ptr = CAllocate(32)
         Dim lpszSendBufferPtr As ZString Ptr
         Dim lpszTopic As String = "quotes"
         Dim lpszSendMessage As String = lpszTopic & "#Bid: " & Str(RndRange(9000, 1000)) & ",Ask:" + Str(RndRange(9000, 1000))
-
-        NnSocketRec.Recv(Socket, lpszRecvBufferPtr, 32, 0)
-        
-        Sleep(2)
-        
-        Dim lpszReturnMessage As String = *CPtr(ZString Ptr, lpszRecvBufferPtr)
-        
-        If lpszReturnMessage <> "" Then
-            Print("Received: ")
-            Print(lpszReturnMessage)
-        End If
        
         lpszSendBufferPtr = CAllocate(Len(lpszSendMessage), SizeOfDefZStringPtr(lpszSendBufferPtr))
         *lpszSendBufferPtr = lpszSendMessage
 
         NnSocketRec.Send(Socket, lpszSendBufferPtr, Len(lpszSendMessage), 0)
+        Print("Published: " & lpszSendMessage)
 
-        Deallocate(lpszRecvBufferPtr) 
-        Deallocate(lpszSendBufferPtr) 
-
-        lpszRecvBufferPtr = 0
+        Deallocate(lpszSendBufferPtr)
         lpszSendBufferPtr = 0
+
+        Sleep(500)
     Wend
     
     NnSocketRec.Close(Socket)

@@ -16,7 +16,7 @@ Const lpszServerAddr As String = "tcp://localhost:1700"
 Dim hLibrary As Any Ptr = NnDllOpen(lpszLibNnDll)
 
 If hLibrary > 0 Then
-    Dim Socket As Any Ptr = NnSocket(hLibrary, AF_SP, NN_REQ)
+    Dim Socket As Long = NnSocket(hLibrary, AF_SP, NN_REQ)
     Dim Rc As Long = NnConnect(hLibrary, Socket, lpszServerAddr)
     
     Print("Connect to Server: " & lpszServerAddr)

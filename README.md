@@ -15,6 +15,15 @@ Nanomsg Wrapper for FreeBasic Programming Language.
 
 Building requires FreeBasic Compiler and test under Windows 10.  
 
+## API Notes
+
+- Socket handles are `Long` (matching C `int`), not pointers.
+- `NnSetsockopt` / `LibNanomsgSocket.Setsockopt` take a pointer (`Any Ptr`) and length.
+- Use `NnSetsockoptString` / `SetsockoptString` for topic strings (`NN_SUB_SUBSCRIBE`).
+- Use `NnSetsockoptInt` / `SetsockoptInt` for integer options (`NN_RCVTIMEO`, …).
+- `NnGetsockopt` requires `optval As Any Ptr` and `optvallen As UInteger Ptr` (in/out length), matching the C API.
+- Use `NnGetsockoptInt` / `GetsockoptInt` for integer options.
+
 ## Example
 
 Publisher Server
@@ -46,7 +55,7 @@ Const lpszServerAddr As String = "tcp://*:1689"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_PUB)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_PUB)
     Dim Rc As Long = NnSocketRec.Bind(Socket, lpszServerAddr)
 
     Print("Bind an IP address: " & lpszServerAddr)
@@ -54,32 +63,20 @@ If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
     Randomize
     
     While 1
-        Dim lpszRecvBufferPtr As Any Ptr = CAllocate(32)
         Dim lpszSendBufferPtr As ZString Ptr
         Dim lpszTopic As String = "quotes"
         Dim lpszSendMessage As String = lpszTopic & "#Bid: " & Str(RndRange(9000, 1000)) & ",Ask:" + Str(RndRange(9000, 1000))
-
-        NnSocketRec.Recv(Socket, lpszRecvBufferPtr, 32, 0)
-        
-        Sleep(2)
-        
-        Dim lpszReturnMessage As String = *CPtr(ZString Ptr, lpszRecvBufferPtr)
-        
-        If lpszReturnMessage <> "" Then
-            Print("Received: ")
-            Print(lpszReturnMessage)
-        End If
        
         lpszSendBufferPtr = CAllocate(Len(lpszSendMessage), SizeOfDefZStringPtr(lpszSendBufferPtr))
         *lpszSendBufferPtr = lpszSendMessage
 
         NnSocketRec.Send(Socket, lpszSendBufferPtr, Len(lpszSendMessage), 0)
+        Print("Published: " & lpszSendMessage)
 
-        Deallocate(lpszRecvBufferPtr) 
-        Deallocate(lpszSendBufferPtr) 
-
-        lpszRecvBufferPtr = 0
+        Deallocate(lpszSendBufferPtr)
         lpszSendBufferPtr = 0
+
+        Sleep(500)
     Wend
     
     NnSocketRec.Close(Socket)
@@ -111,16 +108,12 @@ Const lpszServerAddr As String = "tcp://localhost:1689"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_SUB)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_SUB)
     Dim Rc As Long = NnSocketRec.Connect(Socket, lpszServerAddr)
     
-    Dim lpszSubscribePtr As ZString Ptr
     Dim lpszSubscribe As String = "quotes"
 
-    lpszSubscribePtr = CAllocate(Len(lpszSubscribe), SizeOfDefZStringPtr(lpszSubscribePtr))
-    *lpszSubscribePtr = lpszSubscribe
-
-    NnSocketRec.Setsockopt(Socket, NN_SUB, NN_SUB_SUBSCRIBE, lpszSubscribePtr, Len(lpszSubscribe))
+    NnSocketRec.SetsockoptString(Socket, NN_SUB, NN_SUB_SUBSCRIBE, StrPtr(lpszSubscribe))
     
     While 1
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(64)
@@ -135,10 +128,6 @@ If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
         
         Sleep(2)
     Wend
-
-    Deallocate(lpszSubscribePtr)
-
-    lpszSubscribePtr = 0
     
     NnSocketRec.Close(Socket)
     

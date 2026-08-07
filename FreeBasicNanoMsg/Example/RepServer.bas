@@ -16,7 +16,7 @@ Const lpszServerAddr As String = "tcp://*:1700"
 Dim hLibrary As Any Ptr = NnDllOpen(lpszLibNnDll)
 
 If hLibrary > 0 Then
-    Dim Socket As Any Ptr = NnSocket(hLibrary, AF_SP, NN_REP)
+    Dim Socket As Long = NnSocket(hLibrary, AF_SP, NN_REP)
     Dim Rc As Long = NnBind(hLibrary, Socket, lpszServerAddr)
 
     Print("Bind an IP address: " & lpszServerAddr)

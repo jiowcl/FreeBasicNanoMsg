@@ -19,16 +19,12 @@ Const lpszServerAddr As String = "tcp://localhost:1689"
 Dim NnSocketRec As LibNanomsgSocket
 
 If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
-    Dim Socket As Any Ptr = NnSocketRec.Socket(AF_SP, NN_SUB)
+    Dim Socket As Long = NnSocketRec.Socket(AF_SP, NN_SUB)
     Dim Rc As Long = NnSocketRec.Connect(Socket, lpszServerAddr)
     
-    Dim lpszSubscribePtr As ZString Ptr
     Dim lpszSubscribe As String = "quotes"
 
-    lpszSubscribePtr = CAllocate(Len(lpszSubscribe), SizeOfDefZStringPtr(lpszSubscribePtr))
-    *lpszSubscribePtr = lpszSubscribe
-
-    NnSocketRec.Setsockopt(Socket, NN_SUB, NN_SUB_SUBSCRIBE, lpszSubscribePtr, Len(lpszSubscribe))
+    NnSocketRec.SetsockoptString(Socket, NN_SUB, NN_SUB_SUBSCRIBE, StrPtr(lpszSubscribe))
     
     While 1
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(64)
@@ -43,10 +39,6 @@ If LibNanomsgWrapper.DllOpen(lpszLibNnDll) Then
         
         Sleep(2)
     Wend
-
-    Deallocate(lpszSubscribePtr)
-
-    lpszSubscribePtr = 0
     
     NnSocketRec.Close(Socket)
     
