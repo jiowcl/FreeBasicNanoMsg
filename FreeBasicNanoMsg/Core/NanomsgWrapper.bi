@@ -9,6 +9,7 @@
 #Include Once "LibDll.bi"
 #Include Once "Enums.bi"
 #Include Once "Runtime.bi"
+#Include Once "Message.bi"
 #Include Once "Socket.bi"
 
 #Pragma Once
@@ -37,6 +38,14 @@ public:
     Declare Function Errno() As Long
     Declare Function Strerror(Byval errnum As Integer) As Const ZString Ptr
     Declare Function Symbol(Byval index As Integer, Byref value As Long) As Const ZString Ptr
+End Type
+
+' Declare Type LibNanomsgMessage
+Type LibNanomsgMessage Extends LibNanomsgWrapper
+public:
+    Declare Function Allocmsg(Byval size As UInteger, Byval type_ As Long = 0) As Any Ptr
+    Declare Function Reallocmsg(Byval msg As Any Ptr, Byval size As UInteger) As Any Ptr
+    Declare Function Freemsg(Byval msg As Any Ptr) As Long
 End Type
 
 ' Declare Type LibNanomsgSocket
@@ -151,6 +160,37 @@ End Function
 ' <returns>Returns zstring ptr.</returns>
 Function LibNanomsgRuntime.Symbol(Byval index As Integer, Byref value As Long) As Const ZString Ptr 
     Function = NnSymbol(LibNanomsgWrapper.DllInstance(), index, value)
+End Function
+
+' Type LibNanomsgMessage
+
+' <summary>
+' Allocmsg
+' </summary>
+' <param name="size">UInteger</param>
+' <param name="type_">Long</param>
+' <returns>Returns message buffer pointer, or 0 on error.</returns>
+Function LibNanomsgMessage.Allocmsg(Byval size As UInteger, Byval type_ As Long = 0) As Any Ptr
+    Function = NnAllocmsg(LibNanomsgWrapper.DllInstance(), size, type_)
+End Function
+
+' <summary>
+' Reallocmsg
+' </summary>
+' <param name="msg">Ptr</param>
+' <param name="size">UInteger</param>
+' <returns>Returns message buffer pointer, or 0 on error.</returns>
+Function LibNanomsgMessage.Reallocmsg(Byval msg As Any Ptr, Byval size As UInteger) As Any Ptr
+    Function = NnReallocmsg(LibNanomsgWrapper.DllInstance(), msg, size)
+End Function
+
+' <summary>
+' Freemsg
+' </summary>
+' <param name="msg">Ptr</param>
+' <returns>Returns 0 on success, -1 on error.</returns>
+Function LibNanomsgMessage.Freemsg(Byval msg As Any Ptr) As Long
+    Function = NnFreemsg(LibNanomsgWrapper.DllInstance(), msg)
 End Function
 
 ' Module LibNanomsgSocket

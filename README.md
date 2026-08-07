@@ -25,7 +25,8 @@ Building requires FreeBasic Compiler and test under Windows 10.
 - Use `NnSetsockoptInt` / `SetsockoptInt` for integer options (`NN_RCVTIMEO`, `NN_SURVEYOR_DEADLINE`, …).
 - `NnGetsockopt` requires `optval As Any Ptr` and `optvallen As UInteger Ptr` (in/out length), matching the C API.
 - Use `NnGetsockoptInt` / `GetsockoptInt` for integer options.
-- Zero-copy size sentinel: `NN_MSG`. Poll struct: `NnPollFd` (`NN_POLLIN` / `NN_POLLOUT`).
+- Zero-copy: `NnAllocmsg` / `NnReallocmsg` / `NnFreemsg` (or `LibNanomsgMessage`), with size sentinel `NN_MSG` on send/recv.
+- Poll struct: `NnPollFd` (`NN_POLLIN` / `NN_POLLOUT`).
 
 ## Example
 

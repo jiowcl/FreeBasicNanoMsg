@@ -9,4 +9,5 @@
 #Include Once "LibDll.bi"
 #Include Once "Enums.bi"
 #Include Once "Runtime.bi"
+#Include Once "Message.bi"
 #Include Once "Socket.bi"
