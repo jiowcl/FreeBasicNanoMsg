@@ -4,6 +4,7 @@ Nanomsg Wrapper for FreeBasic Programming Language.
 
 ![GitHub](https://img.shields.io/github/license/jiowcl/FreeBasicNanoMsg.svg)
 ![FreeBasic](https://img.shields.io/badge/language-FreeBasic-blue.svg)
+![Dependency](https://img.shields.io/badge/Protocol-nanomsg-3A3A3A?style=flat-square)
 
 ## Environment
 
