@@ -6,3 +6,6 @@
 
 ### Global ###
 *.exe
+
+### Build output ###
+**/_build/

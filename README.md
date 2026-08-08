@@ -6,11 +6,14 @@ Nanomsg Wrapper for FreeBasic Programming Language.
 ![FreeBasic](https://img.shields.io/badge/language-FreeBasic-blue.svg)
 ![Dependency](https://img.shields.io/badge/Protocol-nanomsg-3A3A3A?style=flat-square)
 
+> **Note:** nanomsg is no longer maintained. For new work, prefer the sibling package [FreeBasicNNG](./FreeBasicNNG) (NNG / nanomsg-next-gen). The two APIs are intentionally incompatible.
+
 ## Environment
 
 - Windows 7 above (recommend)  
 - FreeBasic 1.10.1 above (recommend)  
 - [Nanomsg](https://github.com/nanomsg)  
+- [NNG](https://github.com/nanomsg/nng)  
 
 ## How to Build
 
