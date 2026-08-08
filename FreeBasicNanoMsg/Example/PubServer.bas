@@ -11,7 +11,9 @@ Dim lpszCurrentDir As String = Curdir()
 Dim lpszLibNnDir As String = "/Library/x64"
 Dim lpszLibNnDll As String = lpszCurrentDir & lpszLibNnDir & "/nanomsg.dll"
 
-' Rnd with Range
+Chdir(lpszCurrentDir & lpszLibNnDir)
+
+' Rnd with Range (first = min, last = max)
 ' Source Code from: https://documentation.help/FreeBASIC/KeyPgRnd.html
 Function RndRange(Byval first As Double, Byval last As Double) As Double
     Function = Rnd * (last - first) + first
@@ -24,27 +26,28 @@ Dim hLibrary As Any Ptr = NnDllOpen(lpszLibNnDll)
 If hLibrary > 0 Then
     Dim Socket As Long = NnSocket(hLibrary, AF_SP, NN_PUB)
     Dim Rc As Long = NnBind(hLibrary, Socket, lpszServerAddr)
-    
-    Print("Bind an IP address: " & lpszServerAddr)
 
-    Randomize
-    
-    While 1
-        Dim lpszSendBufferPtr As ZString Ptr
-        Dim lpszTopic As String = "quotes"
-        Dim lpszSendMessage As String = lpszTopic & "#Bid: " & Str(RndRange(9000, 1000)) & ",Ask:" + Str(RndRange(9000, 1000))
+    If Rc < 0 Then
+        Print("Bind failed: " & *NnStrerror(hLibrary, NnErrno(hLibrary)))
+    Else
+        Print("Bind an IP address: " & lpszServerAddr)
 
-        lpszSendBufferPtr = CAllocate(Len(lpszSendMessage), SizeOfDefZStringPtr(lpszSendBufferPtr))
-        *lpszSendBufferPtr = lpszSendMessage
+        Randomize
+        
+        While 1
+            ' Prefix must match NN_SUB_SUBSCRIBE filter on the subscriber.
+            Dim lpszTopic As String = "quotes"
+            Dim lpszSendMessage As String = lpszTopic & "#Bid: " & Str(RndRange(1000, 9000)) & ",Ask:" & Str(RndRange(1000, 9000))
 
-        NnSend(hLibrary, Socket, lpszSendBufferPtr, Len(lpszSendMessage), 0)
-        Print("Published: " & lpszSendMessage)
+            Rc = NnSend(hLibrary, Socket, StrPtr(lpszSendMessage), Len(lpszSendMessage), 0)
 
-        Deallocate(lpszSendBufferPtr)
-        lpszSendBufferPtr = 0
+            If Rc >= 0 Then
+                Print("Published: " & lpszSendMessage)
+            End If
 
-        Sleep(500)
-    Wend
+            Sleep(500)
+        Wend
+    End If
     
     NnClose(hLibrary, Socket)
     
