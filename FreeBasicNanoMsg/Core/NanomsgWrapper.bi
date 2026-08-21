@@ -38,6 +38,7 @@ public:
     Declare Function Errno() As Long
     Declare Function Strerror(Byval errnum As Integer) As Const ZString Ptr
     Declare Function Symbol(Byval index As Integer, Byref value As Long) As Const ZString Ptr
+    Declare Function Term() As Boolean
 End Type
 
 ' Declare Type LibNanomsgMessage
@@ -63,6 +64,8 @@ public:
     Declare Function Shutdown(Byval socket_ As Long, Byval how As Long) As Long
     Declare Function Send(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
     Declare Function Recv(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
+    Declare Function Poll(Byval fds As Any Ptr, Byval nfds As Long, Byval timeout As Long) As Long
+    Declare Function GetStatistic(Byval socket_ As Long, Byval stat As Long) As ULongInt
 End Type
 
 ' Type LibNanomsgWrapper
@@ -160,6 +163,14 @@ End Function
 ' <returns>Returns zstring ptr.</returns>
 Function LibNanomsgRuntime.Symbol(Byval index As Integer, Byref value As Long) As Const ZString Ptr 
     Function = NnSymbol(LibNanomsgWrapper.DllInstance(), index, value)
+End Function
+
+' <summary>
+' Term
+' </summary>
+' <returns>Returns true if nn_term was called.</returns>
+Function LibNanomsgRuntime.Term() As Boolean
+    Function = NnTerm(LibNanomsgWrapper.DllInstance())
 End Function
 
 ' Type LibNanomsgMessage
@@ -328,4 +339,25 @@ End Function
 ' <returns>Returns long.</returns>
 Function LibNanomsgSocket.Recv(Byval socket_ As Long, Byval buf As Any Ptr, Byval buflen As Uinteger, Byval flags As Long) As Long   
     Function = NnRecv(LibNanomsgWrapper.DllInstance(), socket_, buf, buflen, flags)
+End Function
+
+' <summary>
+' Poll
+' </summary>
+' <param name="fds">NnPollFd Ptr (or array)</param>
+' <param name="nfds">Long</param>
+' <param name="timeout">Long (ms; -1 = forever)</param>
+' <returns>Returns count of ready fds, 0 on timeout, or -1 on error.</returns>
+Function LibNanomsgSocket.Poll(Byval fds As Any Ptr, Byval nfds As Long, Byval timeout As Long) As Long
+    Function = NnPoll(LibNanomsgWrapper.DllInstance(), fds, nfds, timeout)
+End Function
+
+' <summary>
+' GetStatistic
+' </summary>
+' <param name="socket_">Long</param>
+' <param name="stat">Long (NN_STAT_*)</param>
+' <returns>Returns ULongInt statistic value.</returns>
+Function LibNanomsgSocket.GetStatistic(Byval socket_ As Long, Byval stat As Long) As ULongInt
+    Function = NnGetStatistic(LibNanomsgWrapper.DllInstance(), socket_, stat)
 End Function

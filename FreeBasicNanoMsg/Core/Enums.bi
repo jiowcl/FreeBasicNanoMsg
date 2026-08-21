@@ -153,8 +153,8 @@ Const ESOCKTNOSUPPORT As Long = NN_HAUSNUMERO + 28
 Const ETERM          As Long = NN_HAUSNUMERO + 53
 Const EFSM           As Long = NN_HAUSNUMERO + 54
 
-' Matches struct nn_pollfd
-Type NnPollFd
+' Matches struct nn_pollfd (int + short + short)
+Type NnPollFd Field = 4
     fd      As Long
     events  As Short
     revents As Short

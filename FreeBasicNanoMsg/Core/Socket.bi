@@ -17,6 +17,8 @@ Declare Function NnConnect(Byval dllInstance As Any Ptr, Byval socket As Long, B
 Declare Function NnShutdown(Byval dllInstance As Any Ptr, Byval socket As Long, Byval how As Long) As Long
 Declare Function NnSend(Byval dllInstance As Any Ptr, Byval socket As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
 Declare Function NnRecv(Byval dllInstance As Any Ptr, Byval socket As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
+Declare Function NnPoll(Byval dllInstance As Any Ptr, Byval fds As Any Ptr, Byval nfds As Long, Byval timeout As Long) As Long
+Declare Function NnGetStatistic(Byval dllInstance As Any Ptr, Byval socket As Long, Byval stat As Long) As ULongInt
 
 ' Nanomsg Function Declare
 
@@ -274,5 +276,50 @@ Function NnRecv(Byval dllInstance As Any Ptr, Byval socket As Long, Byval buf As
         End If
     End If
     
+    Function = lResult
+End Function
+
+' <summary>
+' NnPoll
+' </summary>
+' <param name="dllInstance">Ptr</param>
+' <param name="fds">NnPollFd Ptr (or array)</param>
+' <param name="nfds">Long</param>
+' <param name="timeout">Long (ms; -1 = forever)</param>
+' <returns>Returns count of ready fds, 0 on timeout, or -1 on error.</returns>
+Function NnPoll(Byval dllInstance As Any Ptr, Byval fds As Any Ptr, Byval nfds As Long, Byval timeout As Long) As Long
+    Dim lResult As Long = -1
+    Dim pFuncCall As Function Cdecl(Byval fds As Any Ptr, Byval nfds As Long, Byval timeout As Long) As Long
+
+    If (dllInstance > 0) Then
+        pFuncCall = DyLibSymbol(dllInstance, "nn_poll")
+
+        If (pFuncCall > 0) Then
+            lResult = pFuncCall(fds, nfds, timeout)
+        End If
+    End If
+
+    Function = lResult
+End Function
+
+' <summary>
+' NnGetStatistic
+' </summary>
+' <param name="dllInstance">Ptr</param>
+' <param name="socket">Long</param>
+' <param name="stat">Long (NN_STAT_*)</param>
+' <returns>Returns ULongInt statistic value.</returns>
+Function NnGetStatistic(Byval dllInstance As Any Ptr, Byval socket As Long, Byval stat As Long) As ULongInt
+    Dim lResult As ULongInt = 0
+    Dim pFuncCall As Function Cdecl(Byval socket As Long, Byval stat As Long) As ULongInt
+
+    If (dllInstance > 0) Then
+        pFuncCall = DyLibSymbol(dllInstance, "nn_get_statistic")
+
+        If (pFuncCall > 0) Then
+            lResult = pFuncCall(socket, stat)
+        End If
+    End If
+
     Function = lResult
 End Function

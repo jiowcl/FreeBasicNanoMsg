@@ -9,6 +9,7 @@
 Declare Function NnErrno(Byval dllInstance As Any Ptr) As Long
 Declare Function NnStrerror(Byval dllInstance As Any Ptr, Byval errnum As Integer) As Const ZString Ptr
 Declare Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, Byref value As Long) As Const ZString Ptr
+Declare Function NnTerm(Byval dllInstance As Any Ptr) As Boolean
 
 ' NanoMsg Function Declare
 
@@ -73,4 +74,26 @@ Function NnSymbol(Byval dllInstance As Any Ptr, Byval index As Integer, Byref va
     End If
   
     Function = lResult
+End Function
+
+' <summary>
+' NnTerm
+' Helper for shutting down multi-threaded applications.
+' </summary>
+' <param name="dllInstance">Ptr</param>
+' <returns>Returns true if nn_term was called.</returns>
+Function NnTerm(Byval dllInstance As Any Ptr) As Boolean
+    Dim pFuncCall As Sub Cdecl()
+
+    If (dllInstance > 0) Then
+        pFuncCall = DyLibSymbol(dllInstance, "nn_term")
+
+        If (pFuncCall > 0) Then
+            pFuncCall()
+            Function = True
+            Exit Function
+        End If
+    End If
+
+    Function = False
 End Function

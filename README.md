@@ -17,7 +17,7 @@ Nanomsg Wrapper for FreeBasic Programming Language.
 
 ## How to Build
 
-Building requires FreeBasic Compiler and test under Windows 10.  
+Building requires FreeBasic Compiler and test under Windows 11.  
 
 ## API Notes
 
@@ -30,7 +30,9 @@ Building requires FreeBasic Compiler and test under Windows 10.
 - `NnGetsockopt` requires `optval As Any Ptr` and `optvallen As UInteger Ptr` (in/out length), matching the C API.
 - Use `NnGetsockoptInt` / `GetsockoptInt` for integer options.
 - Zero-copy: `NnAllocmsg` / `NnReallocmsg` / `NnFreemsg` (or `LibNanomsgMessage`), with size sentinel `NN_MSG` on send/recv.
-- Poll struct: `NnPollFd` (`NN_POLLIN` / `NN_POLLOUT`).
+- `NnTerm` / `LibNanomsgRuntime.Term` for multi-thread shutdown.
+- `NnPoll` / `LibNanomsgSocket.Poll` with `NnPollFd` (`NN_POLLIN` / `NN_POLLOUT`); timeout in ms (`-1` = forever).
+- `NnGetStatistic` / `GetStatistic` with `NN_STAT_*` constants.
 
 ## Example
 
