@@ -38,3 +38,43 @@ jobs:
       run: |
         cd ./FreeBasicNNG
         fbc -w all Test/NngTest.bas -x FreeBasicNNG_Test
+
+  windows-runtime:
+    runs-on: windows-2022
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install FreeBASIC Compiler (fbc64)
+      shell: pwsh
+      run: |
+        $archive = Join-Path $env:RUNNER_TEMP "FreeBASIC-1.10.1-win64.zip"
+        $url = "https://downloads.sourceforge.net/fbc/FreeBASIC-1.10.1-win64.zip?download"
+        Invoke-WebRequest -Uri $url -OutFile $archive
+        Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP -Force
+
+        $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc.exe" -Recurse |
+          Select-Object -First 1
+
+        if ($null -eq $fbc) {
+          throw "FreeBASIC compiler (fbc.exe) was not found."
+        }
+
+        "FBC_PATH=$($fbc.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        & $fbc.FullName -version
+
+    - name: Build and run FreeBasicNNG Tests
+      shell: pwsh
+      working-directory: ./FreeBasicNNG
+      run: |
+        & $env:FBC_PATH -w all Test/NngTest.bas -target win64 -x Test/NngTest.exe
+        if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+        }
+
+        & .\Test\NngTest.exe
+        if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+        }
