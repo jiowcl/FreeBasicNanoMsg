@@ -185,7 +185,6 @@ Code released under the MIT license.
 ## TODO
 
 - BUS example  
-- Strengthen CI (compile all examples + smoke tests)  
 
 ## Donation
 

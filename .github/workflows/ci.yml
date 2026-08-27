@@ -7,8 +7,9 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  linux-build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
 
     steps:
     - name: Checkout code
@@ -23,25 +24,71 @@ jobs:
       run: |
         URL="https://sourceforge.net/projects/fbc/files/FreeBASIC-1.10.1/Binaries-Linux/FreeBASIC-1.10.1-ubuntu-22.04-x86_64.tar.gz/download"
         curl -s -L "$URL" | tar -xz
-        
+
         cd FreeBASIC-1.10.1-ubuntu-22.04-x86_64
         sudo ./install.sh -i
-        
+
         fbc -version
 
-    - name: Compile FreeBasicNanoMsg Project
+    - name: Compile all FreeBasicNanoMsg examples
       run: |
-        cd ./FreeBasicNanoMsg/Example
-        fbc -w all Nanomsg.bas -x FreeBasicNanoMsg_Test
+        set -euo pipefail
+        ex="./FreeBasicNanoMsg/Example"
+        out="$ex/_ci_out"
+        mkdir -p "$out"
+
+        files=(
+          Nanomsg.bas
+          PubServer.bas
+          SubClient.bas
+          RepServer.bas
+          ReqClient.bas
+          PushServer.bas
+          PullClient.bas
+          SurveyorServer.bas
+          RespondentClient.bas
+          PairInproc.bas
+          Module/PubServer.bas
+          Module/SubClient.bas
+          Module/RepServer.bas
+          Module/ReqClient.bas
+          Module/PushServer.bas
+          Module/PullClient.bas
+          Module/SurveyorServer.bas
+          Module/RespondentClient.bas
+          Module/PairInproc.bas
+        )
+
+        failed=0
+        for f in "${files[@]}"; do
+          name="${f//\//-}"
+          name="${name%.bas}"
+          echo "=== Compiling $f ==="
+          if ! fbc -w all "$ex/$f" -x "$out/$name"; then
+            echo "FAILED: $f"
+            failed=1
+          else
+            echo "OK: $f"
+          fi
+        done
+
+        if [ "$failed" -ne 0 ]; then
+          echo "One or more FreeBasicNanoMsg examples failed to compile."
+          exit 1
+        fi
+        echo "Compiled ${#files[@]} FreeBasicNanoMsg examples."
+
+    - name: Compile FreeBasicNanoMsg smoke test
+      run: |
+        fbc -w all ./FreeBasicNanoMsg/Test/Smoke.bas -x ./FreeBasicNanoMsg/Test/Smoke
 
     - name: Compile FreeBasicNNG Tests
       run: |
-        cd ./FreeBasicNNG
-        fbc -w all Test/NngTest.bas -x FreeBasicNNG_Test
+        fbc -w all ./FreeBasicNNG/Test/NngTest.bas -x ./FreeBasicNNG/Test/FreeBasicNNG_Test
 
   windows-runtime:
     runs-on: windows-2022
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
     - name: Checkout code
@@ -55,15 +102,88 @@ jobs:
         Invoke-WebRequest -Uri $url -OutFile $archive
         Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP -Force
 
-        $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc.exe" -Recurse |
+        $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc64.exe" -Recurse |
           Select-Object -First 1
+        if ($null -eq $fbc) {
+          $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc.exe" -Recurse |
+            Select-Object -First 1
+        }
 
         if ($null -eq $fbc) {
-          throw "FreeBASIC compiler (fbc.exe) was not found."
+          throw "FreeBASIC compiler (fbc64.exe / fbc.exe) was not found."
         }
 
         "FBC_PATH=$($fbc.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         & $fbc.FullName -version
+
+    - name: Compile all FreeBasicNanoMsg examples
+      shell: pwsh
+      working-directory: ./FreeBasicNanoMsg/Example
+      run: |
+        $outDir = Join-Path (Get-Location) "_ci_out"
+        New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
+        $files = @(
+          "Nanomsg.bas",
+          "PubServer.bas",
+          "SubClient.bas",
+          "RepServer.bas",
+          "ReqClient.bas",
+          "PushServer.bas",
+          "PullClient.bas",
+          "SurveyorServer.bas",
+          "RespondentClient.bas",
+          "PairInproc.bas",
+          "Module/PubServer.bas",
+          "Module/SubClient.bas",
+          "Module/RepServer.bas",
+          "Module/ReqClient.bas",
+          "Module/PushServer.bas",
+          "Module/PullClient.bas",
+          "Module/SurveyorServer.bas",
+          "Module/RespondentClient.bas",
+          "Module/PairInproc.bas"
+        )
+
+        $failed = @()
+        foreach ($f in $files) {
+          $name = ($f -replace '[\\/]', '-').Replace('.bas', '')
+          $dst = Join-Path $outDir "$name.exe"
+          Write-Host "=== Compiling $f ==="
+          & $env:FBC_PATH -w all $f -target win64 -x $dst
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path $dst)) {
+            Write-Host "FAILED: $f"
+            $failed += $f
+          } else {
+            Write-Host "OK: $f"
+          }
+        }
+
+        if ($failed.Count -gt 0) {
+          Write-Error ("Compilation failed for: " + ($failed -join ", "))
+          exit 1
+        }
+        Write-Host "Compiled $($files.Count) FreeBasicNanoMsg examples."
+
+    - name: Build and run FreeBasicNanoMsg smoke test
+      shell: pwsh
+      working-directory: ./FreeBasicNanoMsg
+      run: |
+        if (-not (Test-Path "Library/x64/nanomsg.dll")) {
+          throw "Bundled Library/x64/nanomsg.dll is missing."
+        }
+
+        & $env:FBC_PATH -w all Test/Smoke.bas -target win64 -x Test/Smoke.exe
+        if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+        }
+
+        & .\Test\Smoke.exe
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "FreeBasicNanoMsg smoke test failed with exit code $LASTEXITCODE"
+          exit $LASTEXITCODE
+        }
+        Write-Host "FreeBasicNanoMsg smoke test passed."
 
     - name: Build and run FreeBasicNNG Tests
       shell: pwsh
