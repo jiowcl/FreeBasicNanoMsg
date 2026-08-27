@@ -31,7 +31,7 @@ If (hLibrary > 0) And (NngInit(hLibrary) = NNG_OK) Then
         Dim lpszSendBufferPtr As ZString Ptr
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(32)
         Dim lpszSendMessage As String = "From Client"
-        Dim sz As UInteger = 32
+        Dim sz As ULongInt = 32
 
         lpszSendBufferPtr = CAllocate(Len(lpszSendMessage), SizeOfDefZStringPtr(lpszSendBufferPtr))
         *lpszSendBufferPtr = lpszSendMessage

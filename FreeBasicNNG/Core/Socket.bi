@@ -23,16 +23,16 @@ Declare Function NngBus0Open(Byval dllInstance As Any Ptr, Byval sock As Long Pt
 Declare Function NngSocketClose(Byval dllInstance As Any Ptr, Byval sock As Long) As Long
 Declare Function NngListen(Byval dllInstance As Any Ptr, Byval sock As Long, Byval addr As Const ZString Ptr, Byval flags As Long = 0) As Long
 Declare Function NngDial(Byval dllInstance As Any Ptr, Byval sock As Long, Byval addr As Const ZString Ptr, Byval flags As Long = 0) As Long
-Declare Function NngSend(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
-Declare Function NngSendString(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As UInteger, Byval flags As Long) As Long
-Declare Function NngRecv(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval sz As UInteger Ptr, Byval flags As Long) As Long
-Declare Function NngRecvBuffer(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
+Declare Function NngSend(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
+Declare Function NngSendString(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
+Declare Function NngRecv(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval sz As ULongInt Ptr, Byval flags As Long) As Long
+Declare Function NngRecvBuffer(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval buflen As ULongInt, Byval flags As Long) As LongInt
 Declare Function NngSocketSetMs(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long) As Long
 Declare Function NngSocketGetMs(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long Ptr) As Long
 Declare Function NngSocketSetInt(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long) As Long
 Declare Function NngSocketGetInt(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long Ptr) As Long
-Declare Function NngSocketSetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger) As Long
-Declare Function NngSocketGetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger Ptr) As Long
+Declare Function NngSocketSetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt) As Long
+Declare Function NngSocketGetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt Ptr) As Long
 Declare Function NngSub0Subscribe(Byval dllInstance As Any Ptr, Byval sock As Long, Byval topic As Const ZString Ptr) As Long
 Declare Function NngSub0Unsubscribe(Byval dllInstance As Any Ptr, Byval sock As Long, Byval topic As Const ZString Ptr) As Long
 Declare Function NngSocketGetRecvPollFd(Byval dllInstance As Any Ptr, Byval sock As Long, Byval fdp As Long Ptr) As Long
@@ -248,12 +248,12 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="buf">Ptr</param>
-' <param name="leng">UInteger</param>
+' <param name="leng">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long (nng_err).</returns>
-Function NngSend(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+Function NngSend(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
     
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nng_send")
@@ -272,10 +272,10 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="buf">Const ZString Ptr</param>
-' <param name="leng">UInteger</param>
+' <param name="leng">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long (nng_err).</returns>
-Function NngSendString(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+Function NngSendString(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
     Function = NngSend(dllInstance, sock, Cast(Any Ptr, buf), leng, flags)
 End Function
 
@@ -286,12 +286,12 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="buf">Ptr</param>
-' <param name="sz">UInteger Ptr (in/out size)</param>
+' <param name="sz">ULongInt Ptr (in/out size)</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long (nng_err).</returns>
-Function NngRecv(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval sz As UInteger Ptr, Byval flags As Long) As Long
+Function NngRecv(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval sz As ULongInt Ptr, Byval flags As Long) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As UInteger Ptr, Byval flags As Long) As Long
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As ULongInt Ptr, Byval flags As Long) As Long
     
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nng_recv")
@@ -311,15 +311,15 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="buf">Ptr</param>
-' <param name="buflen">UInteger</param>
+' <param name="buflen">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
-Function NngRecvBuffer(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval buflen As UInteger, Byval flags As Long) As Long
-    Dim sz As UInteger = buflen
+Function NngRecvBuffer(Byval dllInstance As Any Ptr, Byval sock As Long, Byval buf As Any Ptr, Byval buflen As ULongInt, Byval flags As Long) As LongInt
+    Dim sz As ULongInt = buflen
     Dim lResult As Long = NngRecv(dllInstance, sock, buf, @sz, flags)
 
     If (lResult = NNG_OK) Then
-        Function = Cast(Long, sz)
+        Function = Cast(LongInt, sz)
         Exit Function
     End If
 
@@ -424,11 +424,11 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="opt">Const ZString Ptr</param>
-' <param name="optval">UInteger</param>
+' <param name="optval">ULongInt</param>
 ' <returns>Returns long (nng_err).</returns>
-Function NngSocketSetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger) As Long
+Function NngSocketSetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger) As Long
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt) As Long
     
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nng_socket_set_size")
@@ -447,11 +447,11 @@ End Function
 ' <param name="dllInstance">Ptr</param>
 ' <param name="sock">Long</param>
 ' <param name="opt">Const ZString Ptr</param>
-' <param name="optval">UInteger Ptr</param>
+' <param name="optval">ULongInt Ptr</param>
 ' <returns>Returns long (nng_err).</returns>
-Function NngSocketGetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger Ptr) As Long
+Function NngSocketGetSize(Byval dllInstance As Any Ptr, Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt Ptr) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger Ptr) As Long
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt Ptr) As Long
     
     If (dllInstance > 0) Then
         pFuncCall = DyLibSymbol(dllInstance, "nng_socket_get_size")
@@ -473,8 +473,8 @@ End Function
 ' <returns>Returns long (nng_err).</returns>
 Function NngSub0Subscribe(Byval dllInstance As Any Ptr, Byval sock As Long, Byval topic As Const ZString Ptr) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As UInteger) As Long
-    Dim topicLen As UInteger = 0
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As ULongInt) As Long
+    Dim topicLen As ULongInt = 0
 
     If (topic <> 0) Then
         topicLen = Len(*topic)
@@ -500,8 +500,8 @@ End Function
 ' <returns>Returns long (nng_err).</returns>
 Function NngSub0Unsubscribe(Byval dllInstance As Any Ptr, Byval sock As Long, Byval topic As Const ZString Ptr) As Long
     Dim lResult As Long = NNG_EINVAL
-    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As UInteger) As Long
-    Dim topicLen As UInteger = 0
+    Dim pFuncCall As Function Cdecl(Byval sock As Long, Byval buf As Any Ptr, Byval sz As ULongInt) As Long
+    Dim topicLen As ULongInt = 0
 
     If (topic <> 0) Then
         topicLen = Len(*topic)

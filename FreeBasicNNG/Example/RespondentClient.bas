@@ -47,7 +47,7 @@ If (hLibrary > 0) And (NngInit(hLibrary) = NNG_OK) Then
 
     While 1
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(RECV_BUFSIZE)
-        Dim sz As UInteger = RECV_BUFSIZE
+        Dim sz As ULongInt = RECV_BUFSIZE
 
         Rc = NngRecv(hLibrary, Socket, lpszRecvBufferPtr, @sz, 0)
 

@@ -55,7 +55,7 @@ If (hLibrary > 0) And (NngInit(hLibrary) = NNG_OK) Then
     Dim lpszPing As String = "ping"
     Dim lpszPong As String = "pong"
     Dim buffer As Any Ptr = CAllocate(64)
-    Dim sz As UInteger
+    Dim sz As ULongInt
 
     If NngSend(hLibrary, sockA, StrPtr(lpszPing), Len(lpszPing), 0) <> NNG_OK Then
         Print("Send ping failed: " & *NngStrerror(hLibrary, Rc))

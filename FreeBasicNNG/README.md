@@ -27,6 +27,7 @@ cd FreeBasicNNG
 fbc Example/Nng.bas -target win64
 fbc Example/PubServer.bas -target win64
 fbc Example/Module/PubServer.bas -target win64
+fbc Test/NngTest.bas -target win64
 ```
 
 ## API Notes  
@@ -34,9 +35,10 @@ fbc Example/Module/PubServer.bas -target win64
 - Success is `NNG_OK` (`0`). Unlike nanomsg, most calls return an `nng_err` directly (no `nn_errno`).
 - Create sockets with protocol helpers: `PubOpen`, `SubOpen`, `ReqOpen`, … (not `Socket(domain, protocol)`).
 - Use `Listen` / `Dial` instead of nanomsg `Bind` / `Connect`.
-- `Recv` (wrapper) returns the byte count on success, or `-1` on failure; read `LibNngRuntime.LastError()` for the `nng_err`.
-- Low-level `NngRecv` takes an in/out size pointer (`UInteger Ptr`), matching the C API.
+- `Recv` (wrapper) returns the byte count as `LongInt` on success, or `-1` on failure; read `LibNngRuntime.LastError()` for the `nng_err`.
+- Low-level `NngSend` / `NngRecv` use `ULongInt` for message lengths and the in/out size pointer, matching 64-bit Windows `size_t`.
 - Socket options use string names (`NNG_OPT_RECVTIMEO`, …) with typed setters (`SetMs` / `SetInt` / `SetSize`).
+- `SetSize` / `GetSize` use `ULongInt` because their C API type is `size_t`.
 - SUB topics use `Subscribe` / `Unsubscribe` (`nng_sub0_socket_subscribe`).
 - Call `nng_init` via `DllOpen` (wrapper) or `NngInit` (low-level); pair with `DllClose` / `NngFini`.
 - There is no `nn_poll`; use `SetMs(..., NNG_OPT_RECVTIMEO, …)` or `GetRecvPollFd` with an OS poll.
@@ -108,6 +110,23 @@ More samples under `Example`:
 - PUB/SUB, REQ/REP, PUSH/PULL (recv-timeout instead of `nn_poll`)
 - Survey (`SurveyorServer` / `RespondentClient`)
 - PAIR + `inproc://` smoke test (`PairInproc`)
+
+## Tests
+
+`Test/NngTest.bas` is a finite test suite intended for local verification and CI. It uses
+only `inproc://` endpoints, so no network service is required. It verifies:
+
+- 64-bit `size_t` message lengths and option values
+- protection against overwriting adjacent memory through `nng_recv` / `nng_socket_get_size`
+- PAIR, REQ/REP and PUB/SUB communication
+- receive timeout and subscription errors
+
+Run it from the `FreeBasicNNG` package root:
+
+```bash
+fbc -w all Test/NngTest.bas -target win64 -x _build/NngTest.exe
+_build/NngTest.exe
+```
 
 ## Nanomsg vs NNG (quick map)  
 

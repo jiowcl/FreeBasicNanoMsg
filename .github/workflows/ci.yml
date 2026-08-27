@@ -33,3 +33,8 @@ jobs:
       run: |
         cd ./FreeBasicNanoMsg/Example
         fbc -w all Nanomsg.bas -x FreeBasicNanoMsg_Test
+
+    - name: Compile FreeBasicNNG Tests
+      run: |
+        cd ./FreeBasicNNG
+        fbc -w all Test/NngTest.bas -x FreeBasicNNG_Test

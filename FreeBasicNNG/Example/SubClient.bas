@@ -58,7 +58,7 @@ If (hLibrary > 0) And (NngInit(hLibrary) = NNG_OK) Then
             Else
                 While 1
                     Dim lpszRecvBufferPtr As Any Ptr = CAllocate(RECV_BUFSIZE)
-                    Dim recvRc As Long = NngRecvBuffer(hLibrary, Socket, lpszRecvBufferPtr, RECV_BUFSIZE, 0)
+                    Dim recvRc As LongInt = NngRecvBuffer(hLibrary, Socket, lpszRecvBufferPtr, RECV_BUFSIZE, 0)
 
                     If recvRc >= 0 Then
                         Print(BytesToString(lpszRecvBufferPtr, recvRc))

@@ -55,7 +55,7 @@ If LibNngWrapper.DllOpen(lpszLibNngDll) Then
         Else
             While 1
                 Dim lpszRecvBufferPtr As Any Ptr = CAllocate(RECV_BUFSIZE)
-                Dim recvRc As Long = NngSocketRec.Recv(Socket, lpszRecvBufferPtr, RECV_BUFSIZE, 0)
+                Dim recvRc As LongInt = NngSocketRec.Recv(Socket, lpszRecvBufferPtr, RECV_BUFSIZE, 0)
 
                 If recvRc >= 0 Then
                     Print(BytesToString(lpszRecvBufferPtr, recvRc))

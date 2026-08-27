@@ -33,7 +33,7 @@ If (hLibrary > 0) And (NngInit(hLibrary) = NNG_OK) Then
         Dim lpszRecvBufferPtr As Any Ptr = CAllocate(32)
         Dim lpszSendBufferPtr As ZString Ptr
         Dim lpszSendMessage As String = "Hi " & lTotal
-        Dim sz As UInteger = 32
+        Dim sz As ULongInt = 32
 
         NngRecv(hLibrary, Socket, lpszRecvBufferPtr, @sz, 0)
 

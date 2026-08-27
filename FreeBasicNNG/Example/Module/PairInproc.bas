@@ -61,7 +61,7 @@ If LibNngWrapper.DllOpen(lpszLibNngDll) Then
     End If
 
     If ok Then
-        Dim recvRc As Long = NngSocketRec.Recv(sockB, buffer, 64, 0)
+        Dim recvRc As LongInt = NngSocketRec.Recv(sockB, buffer, 64, 0)
 
         If recvRc < 0 Then
             Print("Recv ping failed: " & *NngRuntime.Strerror(LibNngRuntime.LastError()))
@@ -79,7 +79,7 @@ If LibNngWrapper.DllOpen(lpszLibNngDll) Then
     End If
 
     If ok Then
-        Dim recvRc2 As Long = NngSocketRec.Recv(sockA, buffer, 64, 0)
+        Dim recvRc2 As LongInt = NngSocketRec.Recv(sockA, buffer, 64, 0)
 
         If recvRc2 < 0 Then
             Print("Recv pong failed: " & *NngRuntime.Strerror(LibNngRuntime.LastError()))

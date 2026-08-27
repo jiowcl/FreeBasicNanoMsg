@@ -59,15 +59,15 @@ public:
     Declare Function Close(Byval sock As Long) As Long
     Declare Function Listen(Byval sock As Long, Byval addr As Const ZString Ptr, Byval flags As Long = 0) As Long
     Declare Function Dial(Byval sock As Long, Byval addr As Const ZString Ptr, Byval flags As Long = 0) As Long
-    Declare Function Send(Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
-    Declare Function SendString(Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As UInteger, Byval flags As Long) As Long
-    Declare Function Recv(Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+    Declare Function Send(Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
+    Declare Function SendString(Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
+    Declare Function Recv(Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As LongInt
     Declare Function SetMs(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long) As Long
     Declare Function GetMs(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long Ptr) As Long
     Declare Function SetInt(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long) As Long
     Declare Function GetInt(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As Long Ptr) As Long
-    Declare Function SetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger) As Long
-    Declare Function GetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger Ptr) As Long
+    Declare Function SetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt) As Long
+    Declare Function GetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt Ptr) As Long
     Declare Function Subscribe(Byval sock As Long, Byval topic As Const ZString Ptr) As Long
     Declare Function Unsubscribe(Byval sock As Long, Byval topic As Const ZString Ptr) As Long
     Declare Function GetRecvPollFd(Byval sock As Long, Byval fdp As Long Ptr) As Long
@@ -406,10 +406,10 @@ End Function
 ' </summary>
 ' <param name="sock">Long</param>
 ' <param name="buf">Ptr</param>
-' <param name="leng">UInteger</param>
+' <param name="leng">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long (nng_err).</returns>
-Function LibNngSocket.Send(Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+Function LibNngSocket.Send(Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
     Function = StoreLastError(NngSend(LibNngWrapper.DllInstance(), sock, buf, leng, flags))
 End Function
 
@@ -418,10 +418,10 @@ End Function
 ' </summary>
 ' <param name="sock">Long</param>
 ' <param name="buf">Const ZString Ptr</param>
-' <param name="leng">UInteger</param>
+' <param name="leng">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long (nng_err).</returns>
-Function LibNngSocket.SendString(Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As UInteger, Byval flags As Long) As Long
+Function LibNngSocket.SendString(Byval sock As Long, Byval buf As Const ZString Ptr, Byval leng As ULongInt, Byval flags As Long) As Long
     Function = StoreLastError(NngSendString(LibNngWrapper.DllInstance(), sock, buf, leng, flags))
 End Function
 
@@ -432,17 +432,17 @@ End Function
 ' </summary>
 ' <param name="sock">Long</param>
 ' <param name="buf">Ptr</param>
-' <param name="leng">UInteger</param>
+' <param name="leng">ULongInt</param>
 ' <param name="flags">Long</param>
 ' <returns>Returns long.</returns>
-Function LibNngSocket.Recv(Byval sock As Long, Byval buf As Any Ptr, Byval leng As UInteger, Byval flags As Long) As Long
-    Dim sz As UInteger = leng
+Function LibNngSocket.Recv(Byval sock As Long, Byval buf As Any Ptr, Byval leng As ULongInt, Byval flags As Long) As LongInt
+    Dim sz As ULongInt = leng
     Dim rc As Long = NngRecv(LibNngWrapper.DllInstance(), sock, buf, @sz, flags)
 
     StoreLastError(rc)
 
     If (rc = NNG_OK) Then
-        Function = Cast(Long, sz)
+        Function = Cast(LongInt, sz)
         Exit Function
     End If
 
@@ -498,9 +498,9 @@ End Function
 ' </summary>
 ' <param name="sock">Long</param>
 ' <param name="opt">Const ZString Ptr</param>
-' <param name="optval">UInteger</param>
+' <param name="optval">ULongInt</param>
 ' <returns>Returns long (nng_err).</returns>
-Function LibNngSocket.SetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger) As Long
+Function LibNngSocket.SetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt) As Long
     Function = StoreLastError(NngSocketSetSize(LibNngWrapper.DllInstance(), sock, opt, optval))
 End Function
 
@@ -509,9 +509,9 @@ End Function
 ' </summary>
 ' <param name="sock">Long</param>
 ' <param name="opt">Const ZString Ptr</param>
-' <param name="optval">UInteger Ptr</param>
+' <param name="optval">ULongInt Ptr</param>
 ' <returns>Returns long (nng_err).</returns>
-Function LibNngSocket.GetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As UInteger Ptr) As Long
+Function LibNngSocket.GetSize(Byval sock As Long, Byval opt As Const ZString Ptr, Byval optval As ULongInt Ptr) As Long
     Function = StoreLastError(NngSocketGetSize(LibNngWrapper.DllInstance(), sock, opt, optval))
 End Function
 
