@@ -17,7 +17,7 @@ Nanomsg Wrapper for FreeBasic Programming Language.
 
 ## How to Build
 
-Building requires FreeBasic Compiler and test under Windows 11.  
+Building requires FreeBasic Compiler and test under Windows 10/11, Ubuntu 22.  
 
 ## API Notes
 
@@ -175,6 +175,21 @@ End If
 
 Print("Press any key to continue...")
 Sleep()
+```
+
+### Continuous Integration  
+
+GitHub Actions (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
+
+- **Linux** (`ubuntu-22.04`): compiles all examples, runs [`Test/Smoke.bas`](FreeBasicNanoMsg/Test/Smoke.bas) against system `libnanomsg.so` (`libnanomsg-dev`).
+- **Windows** (`windows-2022`): compiles all examples, runs Smoke against bundled `Library/x64/nanomsg.dll`.
+
+Local smoke test (package root = `FreeBasicNanoMsg/`):
+
+```bash
+fbc -w all Test/Smoke.bas -x Test/Smoke
+./Test/Smoke    # Linux: install libnanomsg-dev first
+Test\Smoke.exe  # Windows
 ```
 
 ## License

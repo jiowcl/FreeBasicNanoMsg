@@ -78,9 +78,12 @@ jobs:
         fi
         echo "Compiled ${#files[@]} FreeBasicNanoMsg examples."
 
-    - name: Compile FreeBasicNanoMsg smoke test
+    - name: Compile and run FreeBasicNanoMsg smoke test
+      working-directory: ./FreeBasicNanoMsg
       run: |
-        fbc -w all ./FreeBasicNanoMsg/Test/Smoke.bas -x ./FreeBasicNanoMsg/Test/Smoke
+        fbc -w all Test/Smoke.bas -x Test/Smoke
+        ./Test/Smoke
+        test $? -eq 0
 
     - name: Compile FreeBasicNNG Tests
       run: |

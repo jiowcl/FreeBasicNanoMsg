@@ -27,16 +27,45 @@ Function BytesToString(Byval buf As Any Ptr, Byval length As Long) As String
     Function = result
 End Function
 
+' Resolve nanomsg shared library for the current OS (CI: .so on Linux, bundled .dll on Windows).
+Function OpenNanomsgLibrary(Byval pkgRoot As String, Byref resolvedPath As String) As Any Ptr
+    #If defined(__FB_WIN32__) Or defined(__FB_WIN64__)
+        resolvedPath = pkgRoot & "/Library/x64/nanomsg.dll"
+        Function = NnDllOpen(resolvedPath)
+        Exit Function
+    #Else
+        Dim candidates(0 To 3) As String
+        candidates(0) = "libnanomsg.so"
+        candidates(1) = "/usr/lib/x86_64-linux-gnu/libnanomsg.so"
+        candidates(2) = "/usr/lib/libnanomsg.so"
+        candidates(3) = pkgRoot & "/Library/x64/libnanomsg.so"
+
+        Dim i As Integer
+        For i = 0 To 3
+            Dim hTry As Any Ptr = NnDllOpen(candidates(i))
+            If hTry <> 0 Then
+                resolvedPath = candidates(i)
+                Function = hTry
+                Exit Function
+            End If
+        Next
+
+        resolvedPath = ""
+        Function = 0
+    #EndIf
+End Function
+
 Dim pkgRoot As String = Curdir()
-Dim lpszDll As String = pkgRoot & "/Library/x64/nanomsg.dll"
+Dim lpszDll As String = ""
 
-Print("Smoke: dll=" & lpszDll)
+Print("Smoke: pkgRoot=" & pkgRoot)
 
-Dim h As Any Ptr = NnDllOpen(lpszDll)
+Dim h As Any Ptr = OpenNanomsgLibrary(pkgRoot, lpszDll)
 If h = 0 Then
-    Print("FAIL: DllOpen")
+    Print("FAIL: DllOpen (tried libnanomsg.so / system paths)")
     End 1
 End If
+Print("Smoke: lib=" & lpszDll)
 
 ' --- symbols ---
 Dim symbolCount As Long = 0
