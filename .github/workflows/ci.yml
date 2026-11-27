@@ -101,23 +101,28 @@ jobs:
       shell: pwsh
       run: |
         $archive = Join-Path $env:RUNNER_TEMP "FreeBASIC-1.10.1-win64.zip"
-        $url = "https://downloads.sourceforge.net/fbc/FreeBASIC-1.10.1-win64.zip?download"
-        Invoke-WebRequest -Uri $url -OutFile $archive
-        Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP -Force
+        $url = "https://sourceforge.net/projects/fbc/files/FreeBASIC-1.10.1/Binaries-Windows/FreeBASIC-1.10.1-win64.zip/download"
+        # SourceForge returns HTML to Invoke-WebRequest; curl -L gets the real archive.
+        curl.exe -fsSL -o $archive $url
 
-        $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc64.exe" -Recurse |
-          Select-Object -First 1
-        if ($null -eq $fbc) {
-          $fbc = Get-ChildItem -Path $env:RUNNER_TEMP -Filter "fbc.exe" -Recurse |
-            Select-Object -First 1
+        $header = [System.IO.File]::ReadAllBytes($archive)
+        if ($header.Length -lt 1MB -or $header[0] -ne 0x50 -or $header[1] -ne 0x4B) {
+          throw "FreeBASIC download is not a ZIP (size=$($header.Length) bytes). Check SourceForge URL."
         }
 
-        if ($null -eq $fbc) {
-          throw "FreeBASIC compiler (fbc64.exe / fbc.exe) was not found."
+        $installRoot = Join-Path $env:RUNNER_TEMP "FreeBASIC"
+        New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
+        Expand-Archive -Path $archive -DestinationPath $installRoot -Force
+
+        $fbcRoot = Join-Path $installRoot "FreeBASIC-1.10.1-win64"
+        $fbc = Join-Path $fbcRoot "fbc.exe"
+        if (-not (Test-Path $fbc)) {
+          throw "FreeBASIC compiler (fbc.exe) was not found under $fbcRoot"
         }
 
-        "FBC_PATH=$($fbc.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        & $fbc.FullName -version
+        "FBC_PATH=$fbc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        "PATH=$fbcRoot;$fbcRoot\bin\win64;$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        & $fbc -version
 
     - name: Compile all FreeBasicNanoMsg examples
       shell: pwsh
